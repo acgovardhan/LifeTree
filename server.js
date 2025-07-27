@@ -85,6 +85,13 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Database error.' });
   }
 });
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve index.html at root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Start server
 app.listen(PORT, () => {
