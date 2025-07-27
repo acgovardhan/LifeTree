@@ -105,7 +105,7 @@
       cursor: pointer;
     }
 
-    .profile-box, .features {
+    .profile-box {
       margin: 2rem auto;
       max-width: 600px;
       padding: 1rem;
@@ -114,7 +114,12 @@
     }
 
     .features {
-      display: none;
+      margin: 2rem auto;
+      max-width: 600px;
+      padding: 1rem;
+      background: var(--slate-700);
+      border-radius: 10px;
+      display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 1rem;
       margin-top: 1rem;
@@ -137,11 +142,12 @@
       display: none;
       z-index: 998;
     }
-    a{
-      text-decoration: none;
-    }
 
     .overlay.show { display: block; }
+
+    a {
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -196,107 +202,100 @@
 
   <div class="overlay" id="overlay" onclick="closeAllPanels()"></div>
 
-  <!-- SAME HEAD & STYLE as before -->
-<!-- SKIPPING for brevity, since your CSS & structure are fine -->
+  <script>
+    let isLogin = false;
+    let loggedIn = false;
 
-<!-- BODY and SCRIPT -->
-<script>
-  let isLogin = false;
-  let loggedIn = false;
+    const overlay = document.getElementById('overlay');
+    const choicePanel = document.getElementById('choicePanel');
+    const authPanel = document.getElementById('authPanel');
+    const getStartedBtn = document.getElementById('getStartedBtn');
 
-  const overlay = document.getElementById('overlay');
-  const choicePanel = document.getElementById('choicePanel');
-  const authPanel = document.getElementById('authPanel');
-  const getStartedBtn = document.getElementById('getStartedBtn');
+    function openChoice() {
+      if (loggedIn) return;
+      overlay.classList.add('show');
+      choicePanel.classList.add('open');
+    }
 
-  function openChoice() {
-    if (loggedIn) return;
-    overlay.classList.add('show');
-    choicePanel.classList.add('open');
-  }
+    function openAuth(login) {
+      isLogin = login;
+      document.getElementById('formTitle').innerText = isLogin ? 'Login' : 'Register';
+      document.getElementById('walletGroup').style.display = isLogin ? 'none' : 'block';
+      choicePanel.classList.remove('open');
+      authPanel.classList.add('open');
+    }
 
-  function openAuth(login) {
-    isLogin = login;
-    document.getElementById('formTitle').innerText = isLogin ? 'Login' : 'Register';
-    document.getElementById('walletGroup').style.display = isLogin ? 'none' : 'block';
-    choicePanel.classList.remove('open');
-    authPanel.classList.add('open');
-  }
+    function closeAllPanels() {
+      choicePanel.classList.remove('open');
+      authPanel.classList.remove('open');
+      overlay.classList.remove('show');
+    }
 
-  function closeAllPanels() {
-    choicePanel.classList.remove('open');
-    authPanel.classList.remove('open');
-    overlay.classList.remove('show');
-  }
+    function logout() {
+      localStorage.removeItem('user');
+      loggedIn = false;
+      document.getElementById('profileBox').style.display = 'none';
+      document.getElementById('getStartedBtn').style.display = 'inline-block';
+      document.getElementById('logoutBtn').style.display = 'none';
+    }
 
-  function logout() {
-    localStorage.removeItem('user');
-    loggedIn = false;
-    document.getElementById('profileBox').style.display = 'none';
-    document.getElementById('featureBoxes').style.display = 'none';
-    document.getElementById('getStartedBtn').style.display = 'inline-block';
-    document.getElementById('logoutBtn').style.display = 'none';
-  }
+    document.getElementById('authForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  document.getElementById('authForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const walletId = document.getElementById('walletId').value.trim();
 
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const walletId = document.getElementById('walletId').value.trim();
+      const payload = isLogin ? { username, password } : { username, password, walletId };
+      const endpoint = isLogin ? '/login' : '/register';
 
-    const payload = isLogin ? { username, password } : { username, password, walletId };
-    const endpoint = isLogin ? '/login' : '/register';
+      try {
+        const res = await fetch(`${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-    try {
-      const res = await fetch(`http://localhost:3000${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+        const data = await res.json();
+        console.log("Server response:", data);
 
-      const data = await res.json();
-      console.log("Server response:", data);
+        if (!res.ok) {
+          alert(data.message || 'Something went wrong');
+          return;
+        }
 
-      if (!res.ok) {
-        alert(data.message || 'Something went wrong');
-        return;
+        const user = data.user || { username, walletId, numOfNFT: 0 };
+        localStorage.setItem('user', JSON.stringify(user));
+
+        document.getElementById('profileName').textContent = user.username;
+        document.getElementById('profileWallet').textContent = user.walletId;
+        document.getElementById('profileNFT').textContent = user.numOfNFT;
+
+        document.getElementById('profileBox').style.display = 'block';
+        document.getElementById('getStartedBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+
+        closeAllPanels();
+        loggedIn = true;
+      } catch (err) {
+        console.error(err);
+        alert('Error connecting to server');
       }
+    });
 
-      const user = data.user || { username, walletId, numOfNFT: 0 };
-      localStorage.setItem('user', JSON.stringify(user));
-
-      document.getElementById('profileName').textContent = user.username;
-      document.getElementById('profileWallet').textContent = user.walletId;
-      document.getElementById('profileNFT').textContent = user.numOfNFT;
-
-      document.getElementById('profileBox').style.display = 'block';
-      document.getElementById('featureBoxes').style.display = 'grid';
-      document.getElementById('getStartedBtn').style.display = 'none';
-      document.getElementById('logoutBtn').style.display = 'inline-block';
-
-      closeAllPanels();
-      loggedIn = true;
-    } catch (err) {
-      console.error(err);
-      alert('Error connecting to server');
-    }
-  });
-
-  window.addEventListener('DOMContentLoaded', () => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      document.getElementById('profileName').textContent = user.username;
-      document.getElementById('profileWallet').textContent = user.walletId;
-      document.getElementById('profileNFT').textContent = user.numOfNFT;
-      document.getElementById('profileBox').style.display = 'block';
-      document.getElementById('featureBoxes').style.display = 'grid';
-      document.getElementById('getStartedBtn').style.display = 'none';
-      document.getElementById('logoutBtn').style.display = 'inline-block';
-      loggedIn = true;
-    }
-  });
-</script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        document.getElementById('profileName').textContent = user.username;
+        document.getElementById('profileWallet').textContent = user.walletId;
+        document.getElementById('profileNFT').textContent = user.numOfNFT;
+        document.getElementById('profileBox').style.display = 'block';
+        document.getElementById('getStartedBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        loggedIn = true;
+      }
+    });
+  </script>
 
 </body>
 </html>
