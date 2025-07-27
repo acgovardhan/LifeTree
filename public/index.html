@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LifeTree</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-400: #94a3b8;
+      --slate-100: #f1f5f9;
+      --sky-500: #0ea5e9;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--slate-900), var(--slate-800));
+      color: var(--slate-100);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 1rem;
+    }
+
+    .container {
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--white);
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+      color: var(--slate-400);
+      margin-bottom: 2rem;
+    }
+
+    .cta-btn {
+      background-color: var(--sky-500);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white);
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+
+    .side-panel {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 400px;
+      height: 100%;
+      background-color: var(--slate-800);
+      padding: 2rem;
+      transition: right 0.3s ease-in-out;
+      z-index: 999;
+      overflow-y: auto;
+    }
+
+    .side-panel.open {
+      right: 0;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--slate-700);
+      border-radius: 6px;
+      background: var(--slate-900);
+      color: white;
+    }
+
+    .submit-btn {
+      background: var(--sky-500);
+      border: none;
+      padding: 0.6rem;
+      width: 100%;
+      border-radius: 6px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+    }
+
+    .profile-box, .features {
+      margin: 2rem auto;
+      max-width: 600px;
+      padding: 1rem;
+      background: var(--slate-700);
+      border-radius: 10px;
+    }
+
+    .features {
+      display: none;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .feature-box {
+      background: var(--slate-800);
+      padding: 1rem;
+      border-radius: 8px;
+      color: white;
+      border: 1px solid var(--slate-700);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      z-index: 998;
+    }
+    a{
+      text-decoration: none;
+    }
+
+    .overlay.show { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <button class="cta-btn" id="logoutBtn" style="display:none;" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="container">
+    <h1>Welcome to LifeTree</h1>
+    <p class="tagline">Level up. Get certified. Get hired.</p>
+    <button class="cta-btn" id="getStartedBtn" onclick="openChoice()">Get Started</button>
+
+    <div class="profile-box" id="profileBox" style="display:none;">
+      <h3>🧑 Profile</h3>
+      <p><strong>Name:</strong> <span id="profileName"></span></p>
+      <p><strong>Wallet:</strong> <span id="profileWallet"></span></p>
+      <p><strong>NFTs:</strong> <span id="profileNFT"></span></p>
+    </div>
+
+    <div class="features" id="featureBoxes">
+      <a href="chatbot.html" class="feature-box">Daily Tasks</a>
+      <a href="courses.html" class="feature-box">Upskill Yourself</a>
+      <a href="company.html" class="feature-box">Web3 Career Portal</a>
+    </div>
+  </div>
+
+  <div class="side-panel" id="choicePanel">
+    <h2>Choose Action</h2>
+    <button class="submit-btn" onclick="openAuth(false)">Register</button>
+    <button class="submit-btn" onclick="openAuth(true)" style="margin-top: 1rem;">Login</button>
+  </div>
+
+  <div class="side-panel" id="authPanel">
+    <h2 id="formTitle">Register</h2>
+    <form id="authForm">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" required>
+      </div>
+      <div class="form-group" id="walletGroup">
+        <label>Wallet ID</label>
+        <input type="text" id="walletId" required>
+      </div>
+      <button type="submit" class="submit-btn">Submit</button>
+    </form>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="closeAllPanels()"></div>
+
+  <!-- SAME HEAD & STYLE as before -->
+<!-- SKIPPING for brevity, since your CSS & structure are fine -->
+
+<!-- BODY and SCRIPT -->
+<script>
+  let isLogin = false;
+  let loggedIn = false;
+
+  const overlay = document.getElementById('overlay');
+  const choicePanel = document.getElementById('choicePanel');
+  const authPanel = document.getElementById('authPanel');
+  const getStartedBtn = document.getElementById('getStartedBtn');
+
+  function openChoice() {
+    if (loggedIn) return;
+    overlay.classList.add('show');
+    choicePanel.classList.add('open');
+  }
+
+  function openAuth(login) {
+    isLogin = login;
+    document.getElementById('formTitle').innerText = isLogin ? 'Login' : 'Register';
+    document.getElementById('walletGroup').style.display = isLogin ? 'none' : 'block';
+    choicePanel.classList.remove('open');
+    authPanel.classList.add('open');
+  }
+
+  function closeAllPanels() {
+    choicePanel.classList.remove('open');
+    authPanel.classList.remove('open');
+    overlay.classList.remove('show');
+  }
+
+  function logout() {
+    localStorage.removeItem('user');
+    loggedIn = false;
+    document.getElementById('profileBox').style.display = 'none';
+    document.getElementById('featureBoxes').style.display = 'none';
+    document.getElementById('getStartedBtn').style.display = 'inline-block';
+    document.getElementById('logoutBtn').style.display = 'none';
+  }
+
+  document.getElementById('authForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const walletId = document.getElementById('walletId').value.trim();
+
+    const payload = isLogin ? { username, password } : { username, password, walletId };
+    const endpoint = isLogin ? '/login' : '/register';
+
+    try {
+      const res = await fetch(`http://localhost:3000${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      console.log("Server response:", data);
+
+      if (!res.ok) {
+        alert(data.message || 'Something went wrong');
+        return;
+      }
+
+      const user = data.user || { username, walletId, numOfNFT: 0 };
+      localStorage.setItem('user', JSON.stringify(user));
+
+      document.getElementById('profileName').textContent = user.username;
+      document.getElementById('profileWallet').textContent = user.walletId;
+      document.getElementById('profileNFT').textContent = user.numOfNFT;
+
+      document.getElementById('profileBox').style.display = 'block';
+      document.getElementById('featureBoxes').style.display = 'grid';
+      document.getElementById('getStartedBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'inline-block';
+
+      closeAllPanels();
+      loggedIn = true;
+    } catch (err) {
+      console.error(err);
+      alert('Error connecting to server');
+    }
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      document.getElementById('profileName').textContent = user.username;
+      document.getElementById('profileWallet').textContent = user.walletId;
+      document.getElementById('profileNFT').textContent = user.numOfNFT;
+      document.getElementById('profileBox').style.display = 'block';
+      document.getElementById('featureBoxes').style.display = 'grid';
+      document.getElementById('getStartedBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'inline-block';
+      loggedIn = true;
+    }
+  });
+</script>
+
+</body>
+</html>

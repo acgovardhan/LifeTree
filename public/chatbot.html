@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LifeTree: Your Daily Ascent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.sh/@google/genai@^1.11.0"
+      }
+    }
+    </script>
+    <style>
+        :root {
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --sky-500: #0ea5e9;
+            --sky-600: #0284c7;
+            --sky-700: #0369a1;
+            --emerald-500: #10b981;
+            --emerald-700: #047857;
+            --emerald-900: #064e3b;
+            --amber-300: #fcd34d;
+            --amber-400: #fbbf24;
+            --amber-500: #f59e0b;
+            --red-300: #fca5a5;
+            --red-400: #f87171;
+            --red-500: #ef4444;
+            --red-600: #dc2626;
+            --red-700: #b91c1c;
+            --red-900: #7f1d1d;
+            --white: #ffffff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        body {
+            background-color: var(--slate-900);
+            color: var(--slate-100);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 48rem; /* max-w-2xl */
+            margin: auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header .header-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header h1 {
+            font-size: 3rem; /* text-5xl */
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            color: var(--white);
+            margin: 0;
+        }
+
+        header p {
+            font-size: 1.125rem; /* text-lg */
+            color: var(--slate-400);
+            margin: 0;
+        }
+
+        main {
+            background-color: rgba(30, 41, 59, 0.5); /* bg-slate-800/50 */
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--slate-700);
+            border-radius: 1rem; /* rounded-2xl */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 2rem; /* p-8 */
+        }
+        
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .slide-up { animation: slideUp 0.5s ease-out forwards; opacity: 0; }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+            color: var(--slate-400);
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            background-color: var(--slate-700);
+            border-radius: 9999px;
+            height: 0.625rem;
+        }
+
+        .progress-bar-fill {
+            background-color: var(--sky-500);
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.5s ease-out;
+        }
+        
+        .welcome-screen h2 {
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 700;
+            color: var(--slate-100);
+            margin: 0 0 1rem 0;
+        }
+
+        .welcome-screen p {
+            color: var(--slate-400);
+            margin: 0 0 2rem 0;
+        }
+
+        .welcome-screen form {
+            width: 100%;
+            max-width: 28rem;
+        }
+        
+        .welcome-screen input {
+            width: 100%;
+            background-color: var(--slate-700);
+            border: 2px solid var(--slate-600);
+            color: var(--slate-100);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.125rem;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .welcome-screen input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--sky-500);
+            border-color: var(--sky-500);
+        }
+
+        .welcome-screen .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            width: 100%;
+        }
+        
+        button {
+            flex: 1;
+            font-weight: 700;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+            color: var(--white);
+        }
+        
+        button.primary {
+            background-color: var(--sky-500);
+        }
+        button.primary:hover {
+            background-color: var(--sky-600);
+        }
+        button.primary:disabled {
+            background-color: var(--slate-500);
+            cursor: not-allowed;
+        }
+        
+        button.secondary {
+             background-color: var(--slate-600);
+        }
+        button.secondary:hover {
+            background-color: var(--slate-500);
+        }
+
+        /* Loader & Error */
+        .loader, .error-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 250px;
+        }
+        
+        .loader svg {
+            height: 4rem;
+            width: 4rem;
+            animation: spin 1.5s linear infinite;
+            color: var(--sky-400);
+            margin-bottom: 1rem;
+        }
+
+        .loader h2, .error-state h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--slate-200);
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .loader p, .error-state p {
+            color: var(--slate-400);
+            margin: 0;
+        }
+        
+        .error-state {
+            background-color: rgba(127, 29, 29, 0.5); /* bg-red-900/50 */
+            border: 1px solid var(--red-700);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .error-state h3 { color: var(--red-300); }
+        .error-state p { color: var(--red-400); margin-bottom: 1rem; }
+        .error-state button { background-color: var(--red-500); flex: none; }
+        .error-state button:hover { background-color: var(--red-600); }
+        
+        /* Tasks Screen */
+        .tasks-header {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            background-color: rgba(15, 23, 42, 0.5); /* bg-slate-900/50 */
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--slate-700);
+        }
+        
+        @media (min-width: 640px) {
+            .tasks-header {
+                flex-direction: row;
+            }
+        }
+
+        .tasks-header h2 { font-size: 1.5rem; font-weight: 700; color: var(--white); margin: 0; }
+        .tasks-header p { color: var(--slate-400); margin: 0.25rem 0 0 0; }
+        
+        .points-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--amber-400);
+            margin-top: 1rem;
+        }
+        @media (min-width: 640px) {
+            .points-display { margin-top: 0; }
+        }
+
+        .points-display svg {
+            height: 2rem;
+            width: 2rem;
+        }
+        .points-display span {
+            font-size: 2.25rem;
+            font-weight: 700;
+        }
+        
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--slate-600);
+            background-color: rgba(51, 65, 85, 0.5); /* bg-slate-700/50 */
+            opacity: 0;
+        }
+
+        .task-item:hover {
+            background-color: var(--slate-700);
+        }
+
+        .task-item.completed {
+            background-color: rgba(6, 78, 59, 0.5); /* bg-emerald-900/50 */
+            border-color: var(--emerald-700);
+        }
+
+        .task-item .checkbox {
+            flex-shrink: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 9999px;
+            border: 2px solid var(--slate-400);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .task-item.completed .checkbox {
+            background-color: var(--emerald-500);
+            border-color: var(--emerald-500);
+        }
+        .task-item .checkbox svg {
+            width: 1rem;
+            height: 1rem;
+            color: var(--white);
+            stroke-width: 3;
+        }
+
+        .task-item .text {
+            flex-grow: 1;
+            color: var(--slate-200);
+        }
+        .task-item.completed .text {
+            text-decoration: line-through;
+            color: var(--slate-400);
+        }
+
+        .task-item .points {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background-color: rgba(245, 158, 11, 0.2); /* bg-amber-500/20 */
+            color: var(--amber-300);
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+        .task-item .points svg {
+            height: 0.75rem;
+            width: 0.75rem;
+        }
+        
+        button.full-width {
+            width: 100%;
+            margin-top: 2rem;
+            background-color: var(--sky-600);
+        }
+        button.full-width:hover {
+            background-color: var(--sky-700);
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="app-container" class="container"></div>
+
+    <script type="module">
+        import { GoogleGenAI, Type } from "@google/genai";
+
+        const CheckCircleIcon = () => `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>`;
+        const StarIcon = () => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434L10.788 3.21Z" clip-rule="evenodd" /></svg>`;
+        const MoonIcon = () => `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" /></svg>`;
+
+        const PERSONALIZATION_QUESTIONS = [
+            { id: 1, text: "What is one area of your life you want to improve the most?", placeholder: "e.g., Fitness, Learning a new skill, Mindfulness..." },
+            { id: 2, text: "How much time can you realistically dedicate to this each day?", placeholder: "e.g., 15 minutes, 30 minutes, 1 hour..." },
+            { id: 3, text: "What is a long-term goal you're working towards in this area?", placeholder: "e.g., Run a 5k, build a web app, meditate daily..." },
+        ];
+        
+        const generateDailyTasks = async (answers) => {
+            if (!process.env.API_KEY) {
+                console.error("API_KEY is not set.");
+                throw new Error("API key is missing. This app requires an API_KEY environment variable to be set.");
+            }
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+            const schema = {
+                type: Type.ARRAY,
+                items: {
+                    type: Type.OBJECT,
+                    properties: {
+                        text: { type: Type.STRING, description: 'The description of the self-development task.' },
+                        points: { type: Type.INTEGER, description: 'The number of points awarded for completing the task (5-25).' },
+                    },
+                    required: ['text', 'points'],
+                },
+            };
+
+            const [improvementArea, timeDedication, longTermGoal] = answers;
+            const prompt = `
+                You are a self-development coach named Zenith. Your goal is to help users improve their lives by providing concrete, actionable daily tasks.
+                The user wants to improve in the area of: "${improvementArea}".
+                They can dedicate this much time per day: "${timeDedication}".
+                Their long-term goal is: "${longTermGoal}".
+                Based on this information, generate a list of 5-7 small, specific, and achievable daily tasks. For each task, assign points based on its difficulty or impact (between 5 and 25 points). Ensure the tasks are varied and directly contribute to the user's goals within their available time.
+                Return the response ONLY as a JSON array of objects, where each object has a "text" and "points". Do not include any other properties or explanatory text.
+            `;
+
+            try {
+                const response = await ai.models.generateContent({
+                    model: "gemini-2.5-flash",
+                    contents: prompt,
+                    config: { responseMimeType: "application/json", responseSchema: schema, temperature: 0.7 }
+                });
+
+                const jsonText = response.text.trim();
+                const generatedTasks = JSON.parse(jsonText);
+
+                if (!Array.isArray(generatedTasks)) {
+                    throw new Error("API did not return a valid array of tasks.");
+                }
+
+                return generatedTasks.map(task => ({
+                    ...task,
+                    id: crypto.randomUUID(),
+                    completed: false,
+                }));
+            } catch (error) {
+                console.error("Error generating tasks with Gemini:", error);
+                throw new Error("Failed to parse tasks from the AI. The response might have been invalid.");
+            }
+        };
+
+
+        // --- APPLICATION LOGIC ---
+        const app = {
+            state: {
+                appState: 'WELCOME', // WELCOME, TASKS, LOADING, ERROR
+                tasks: [],
+                error: null,
+                currentQuestionIndex: 0,
+                answers: Array(PERSONALIZATION_QUESTIONS.length).fill(''),
+            },
+
+            elements: {
+                container: document.getElementById('app-container'),
+            },
+            
+            init() {
+                this.render();
+            },
+
+            setState(newState) {
+                this.state = { ...this.state, ...newState };
+                this.render();
+            },
+
+            // --- RENDER FUNCTIONS ---
+            render() {
+                this.elements.container.innerHTML = `
+                    <header>
+                        <div class="header-title">
+                            <h1>LifeTree</h1>
+                        </div>
+                        <p>Your daily ascent to a better you.</p>
+                    </header>
+                    <main id="main-content"></main>
+                `;
+                
+                const mainContent = document.getElementById('main-content');
+                switch (this.state.appState) {
+                    case 'LOADING':
+                        mainContent.innerHTML = this.renderLoading();
+                        break;
+                    case 'ERROR':
+                        mainContent.innerHTML = this.renderError();
+                        break;
+                    case 'TASKS':
+                        mainContent.innerHTML = this.renderTasksScreen();
+                        this.attachTasksListeners();
+                        break;
+                    case 'WELCOME':
+                    default:
+                        mainContent.innerHTML = this.renderWelcomeScreen();
+                        this.attachWelcomeListeners();
+                        break;
+                }
+            },
+
+            renderWelcomeScreen() {
+                const { currentQuestionIndex, answers } = this.state;
+                const currentQuestion = PERSONALIZATION_QUESTIONS[currentQuestionIndex];
+                const isLastQuestion = currentQuestionIndex === PERSONALIZATION_QUESTIONS.length - 1;
+                const progressPercentage = ((currentQuestionIndex + 1) / PERSONALIZATION_QUESTIONS.length) * 100;
+                
+                return `
+                    <div class="welcome-screen fade-in">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-info">
+                                <span>Step ${currentQuestionIndex + 1} of ${PERSONALIZATION_QUESTIONS.length}</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-2.5">
+                                <div class="progress-bar-fill" style="width: ${progressPercentage}%;"></div>
+                            </div>
+                        </div>
+                        <h2>${currentQuestion.text}</h2>
+                        <p>This helps us personalize your daily tasks.</p>
+                        <form id="question-form">
+                            <input
+                                type="text"
+                                id="answer-input"
+                                value="${answers[currentQuestionIndex]}"
+                                placeholder="${currentQuestion.placeholder}"
+                                autocomplete="off"
+                                autofocus
+                            />
+                            <div class="button-group">
+                                ${currentQuestionIndex > 0 ? '<button type="button" id="back-btn" class="secondary">Back</button>' : ''}
+                                <button type="submit" id="next-btn" class="primary" ${!answers[currentQuestionIndex].trim() ? 'disabled' : ''}>
+                                    ${isLastQuestion ? 'Start My Journey' : 'Next'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+            },
+            
+            renderTasksScreen() {
+                const { tasks } = this.state;
+                const completedTasks = tasks.filter(t => t.completed).length;
+                const totalPoints = tasks.filter(t => t.completed).reduce((sum, task) => sum + task.points, 0);
+                const progressPercentage = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
+                
+                const tasksHtml = tasks.map((task, index) => `
+                    <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}" style="animation-delay: ${index * 50}ms;">
+                        <div class="checkbox">${task.completed ? CheckCircleIcon() : ''}</div>
+                        <p class="text">${task.text}</p>
+                        <div class="points">${StarIcon()}<span>${task.points}</span></div>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="tasks-screen fade-in">
+                        <div class="tasks-header">
+                            <div>
+                                <h2>Your Daily Ascent</h2>
+                                <p>Complete your tasks to earn points and reach your goals.</p>
+                            </div>
+                            <div class="points-display">
+                                ${StarIcon()}
+                                <span>${totalPoints}</span>
+                            </div>
+                        </div>
+
+                        <div class="progress-bar-container">
+                             <div class="progress-bar-info">
+                                <span>Daily Progress</span>
+                                <span>${completedTasks} / ${tasks.length} Completed</span>
+                            </div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill" style="width: ${progressPercentage}%; background-color: var(--emerald-500);"></div>
+                            </div>
+                        </div>
+
+                        <div class="task-list">${tasksHtml}</div>
+                        <button id="reset-btn" class="full-width">Start a New Day</button>
+                    </div>
+                `;
+            },
+            
+            renderLoading() {
+                return `
+                    <div class="loader">
+                        ${MoonIcon()}
+                        <h2>Generating your path...</h2>
+                        <p>Our AI is crafting personalized tasks just for you.</p>
+                    </div>
+                `;
+            },
+            
+            renderError() {
+                return `
+                     <div class="error-state">
+                        <h3>An Error Occurred</h3>
+                        <p>${this.state.error}</p>
+                        <button id="reset-btn">Try Again</button>
+                    </div>
+                `;
+            },
+            
+            // --- EVENT HANDLERS & LISTENERS ---
+            attachWelcomeListeners() {
+                const form = document.getElementById('question-form');
+                const input = document.getElementById('answer-input');
+                const backBtn = document.getElementById('back-btn');
+                
+                form.addEventListener('submit', (e) => this.handleWelcomeSubmit(e));
+                input.addEventListener('input', (e) => this.handleAnswerChange(e));
+                if (backBtn) {
+                    backBtn.addEventListener('click', () => this.handleBack());
+                }
+            },
+            
+            attachTasksListeners() {
+                document.querySelectorAll('.task-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        this.handleToggleTask(e.currentTarget.dataset.taskId);
+                    });
+                    item.classList.add('slide-up');
+                });
+                document.getElementById('reset-btn').addEventListener('click', () => this.handleReset());
+            },
+
+            handleAnswerChange(e) {
+                const { currentQuestionIndex } = this.state;
+                const newAnswers = [...this.state.answers];
+                newAnswers[currentQuestionIndex] = e.target.value;
+                this.state.answers = newAnswers; // Direct mutation for perf, re-render is manual
+                document.getElementById('next-btn').disabled = !e.target.value.trim();
+            },
+
+            handleBack() {
+                if (this.state.currentQuestionIndex > 0) {
+                    this.setState({ currentQuestionIndex: this.state.currentQuestionIndex - 1 });
+                }
+            },
+            
+            async handleWelcomeSubmit(e) {
+                e.preventDefault();
+                const { currentQuestionIndex, answers } = this.state;
+                const isLastQuestion = currentQuestionIndex === PERSONALIZATION_QUESTIONS.length - 1;
+
+                if (isLastQuestion) {
+                    this.setState({ appState: 'LOADING' });
+                    try {
+                        const newTasks = await generateDailyTasks(answers);
+                        this.setState({ appState: 'TASKS', tasks: newTasks });
+                    } catch (err) {
+                        this.setState({ appState: 'ERROR', error: err.message });
+                    }
+                } else {
+                    this.setState({ currentQuestionIndex: currentQuestionIndex + 1 });
+                }
+            },
+            
+            handleToggleTask(taskId) {
+                const newTasks = this.state.tasks.map(task =>
+                    task.id === taskId ? { ...task, completed: !task.completed } : task
+                );
+                this.setState({ tasks: newTasks });
+            },
+            
+            handleReset() {
+                 this.setState({
+                    appState: 'WELCOME',
+                    tasks: [],
+                    error: null,
+                    currentQuestionIndex: 0,
+                    answers: Array(PERSONALIZATION_QUESTIONS.length).fill(''),
+                });
+            }
+        };
+
+        app.init();
+
+    </script>
+</body>
+</html>

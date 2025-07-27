@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3 Career Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-100: #f1f5f9;
+            --sky-500: #0ea5e9;
+            --sky-600: #0284c7;
+            --white: #ffffff;
+            --blue-600: #2563eb;
+            --blue-700: #1d4ed8;
+            --green-600: #16a34a;
+            --green-700: #15803d;
+        }
+
+        body {
+            background-color: var(--slate-900);
+            color: var(--slate-100);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--sky-500);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            color: var(--white);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .job-card {
+            background-color: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--slate-700);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .job-card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .job-card .nft-req-text {
+            color: var(--slate-400);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .job-card ul {
+            list-style-type: '✔️ ';
+            padding-left: 1.25rem;
+            color: var(--slate-300);
+            font-size: 0.875rem;
+            margin: 0 0 1rem 0;
+            flex-grow: 1;
+        }
+        
+        .job-card li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: auto;
+        }
+
+        button {
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .apply-internship {
+            background-color: var(--blue-600);
+        }
+        .apply-internship:hover {
+            background-color: var(--blue-700);
+        }
+
+        .apply-job {
+            background-color: var(--green-600);
+        }
+        .apply-job:hover {
+            background-color: var(--green-700);
+        }
+        
+        /* Company Name Colors */
+        .text-purple { color: #d8b4fe; }
+        .text-blue { color: #93c5fd; }
+        .text-pink { color: #f9a8d4; }
+        .text-yellow { color: #fde047; }
+        .text-green { color: #86efac; }
+        .text-indigo { color: #a5b4fc; }
+        .text-orange { color: #fdba74; }
+        .text-red { color: #fca5a5; }
+        .text-teal { color: #99f6e4; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">&larr; Back to Main Menu</a>
+        <div class="header">
+            <h1>🌐 Web3 Career Portal</h1>
+        </div>
+
+        <div class="jobs-grid">
+            <div class="job-card">
+                <h2 class="text-purple">🚀 Polygon Labs</h2>
+                <p class="nft-req-text">Required NFTs:</p>
+                <ul><li>Smart Contract Expert</li><li>Blockchain Developer</li><li>Frontend Dev</li></ul>
+                <div class="button-group"><button class="apply-internship">Apply for Internship</button><button class="apply-job">Apply for Job</button></div>
+            </div>
+
+            <div class="job-card">
+                <h2 class="text-blue">🌐 Chainlink</h2>
+                <p class="nft-req-text">Required NFTs:</p>
+                <ul><li>Oracle Integrator</li><li>Solidity Wizard</li></ul>
+                <div class="button-group"><button class="apply-internship">Apply for Internship</button><button class="apply-job">Apply for Job</button></div>
+            </div>
+            
+            <div class="job-card">
+                <h2 class="text-pink">🦄 Uniswap Labs</h2>
+                <p class="nft-req-text">Required NFTs:</p>
+                <ul><li>DeFi Master</li><li>UI/UX Designer</li></ul>
+                <div class="button-group"><button class="apply-internship">Apply for Internship</button><button class="apply-job">Apply for Job</button></div>
+            </div>
+
+            <div class="job-card">
+                <h2 class="text-yellow">💻 Google Web3</h2>
+                <p class="nft-req-text">Required NFTs:</p>
+                <ul><li>Web Development</li><li>AI/ML Researcher</li><li>Cloud Engineer</li></ul>
+                <div class="button-group"><button class="apply-internship">Apply for Internship</button><button class="apply-job">Apply for Job</button></div>
+            </div>
+
+            <div class="job-card">
+                <h2 class="text-green">🤖 OpenAI</h2>
+                <p class="nft-req-text">Required NFTs:</p>
+                <ul><li>AI/ML Pro</li><li>Prompt Engineer</li><li>LLM Trainer</li></ul>
+                <div class="button-group"><button class="apply-internship">Apply for Internship</button><button class="apply-job">Apply for Job</button></div>
+            </div>
+
+            <div class="job-card">
+                <h2 class="text-indigo">📱 Meta</h2>
+                <p class="nft-req-text">Required NFTs:</p>
+                <ul><li>AR/VR Developer</li><li>React Native Expert</li><li>Metaverse Designer</li></ul>
+                <div class="button-group"><button class="apply-internship">Apply for Internship</button><button class="apply-job">Apply for Job</button></div>
+            </div>
+            
+            <div class="job-card">
+                <h2 class="text-orange">💰 Coinbase</h2>
+                <p class="nft-req-text">Required NFTs:</p>
+                <ul><li>Security Auditor</li><li>Backend Engineer</li></ul>
+                <div class="button-group"><button class="apply-internship">Apply for Internship</button><button class="apply-job">Apply for Job</button></div>
+            </div>
+
+            <div class="job-card">
+                <h2 class="text-red">🛠️ Ethereum Foundation</h2>
+                <p class="nft-req-text">Required NFTs:</p>
+                <ul><li>Consensus Mechanism Expert</li><li>Core Protocol Dev</li></ul>
+                <div class="button-group"><button class="apply-internship">Apply for Internship</button><button class="apply-job">Apply for Job</button></div>
+            </div>
+
+            <div class="job-card">
+                <h2 class="text-teal">⚡ Solana</h2>
+                <p class="nft-req-text">Required NFTs:</p>
+                <ul><li>Rust Developer</li><li>DApp Frontend Engineer</li><li>Tokenomics Analyst</li></ul>
+                <div class="button-group"><button class="apply-internship">Apply for Internship</button><button class="apply-job">Apply for Job</button></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

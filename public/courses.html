@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Learning Paths</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-400: #94a3b8;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --sky-500: #0ea5e9;
+            --sky-600: #0284c7;
+            --emerald-500: #10b981;
+            --emerald-700: #047857;
+            --emerald-900: #064e3b;
+            --white: #ffffff;
+        }
+
+        body {
+            background-color: var(--slate-900);
+            color: var(--slate-100);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            color: var(--white);
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .header p {
+            font-size: 1.125rem;
+            color: var(--slate-400);
+            margin: 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--sky-500);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .learning-paths {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .path-card {
+            background-color: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--slate-700);
+            border-radius: 1rem;
+            padding: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+        }
+
+        .path-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--sky-500);
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.1), 0 8px 10px -6px rgba(14, 165, 233, 0.1);
+        }
+        
+        .path-card.selected-path {
+             border-color: var(--sky-500);
+             transform: translateY(-5px);
+             box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.1), 0 8px 10px -6px rgba(14, 165, 233, 0.1);
+        }
+
+        .path-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .path-card h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            color: var(--slate-100);
+        }
+        
+        .path-card p {
+            color: var(--slate-400);
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        
+        .stats, .level-section {
+            background-color: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--slate-700);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stats h3, .level-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            margin: 0 0 1rem 0;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--slate-700);
+        }
+        
+        .stats div {
+            color: var(--slate-400);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+        
+        .stats span {
+            color: var(--slate-100);
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            background: var(--slate-700);
+            height: 12px;
+            border-radius: 9999px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        #xpProgress {
+            background: var(--sky-500);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .course-sections {
+            margin-top: 2rem;
+        }
+
+        .course-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin: 0.75rem 0;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--slate-700);
+            background-color: rgba(51, 65, 85, 0.5);
+        }
+
+        .course-item:hover {
+            background-color: var(--slate-700);
+            transform: translateY(-2px);
+        }
+
+        .course-item.completed {
+            background-color: rgba(6, 78, 59, 0.5);
+            border-color: var(--emerald-700);
+        }
+        
+        .course-item h3 {
+            flex-grow: 1;
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--slate-200);
+        }
+        
+        .course-item.completed h3 {
+             text-decoration: line-through;
+             color: var(--slate-400);
+        }
+
+        .course-item p {
+            margin: 0;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--sky-500);
+        }
+
+        .quiz-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .quiz-content {
+            background: var(--slate-800);
+            padding: 2.5rem 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 100%;
+            margin: auto;
+            text-align: center;
+            border: 1px solid var(--slate-700);
+        }
+        
+        .quiz-content h2 {
+            color: var(--white);
+            margin-top: 0;
+        }
+        
+        #quizQuestion p {
+            color: var(--slate-200);
+            font-size: 1.125rem;
+            line-height: 1.6;
+        }
+        
+        #quizOptions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            background-color: var(--sky-500);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: var(--sky-600);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">&larr; Back to Main Menu</a>
+
+        <div class="header">
+            <h1>Tech Learning Paths</h1>
+            <p>Choose a path to master new technologies, complete quizzes, and earn XP to level up your skills.</p>
+        </div>
+        
+        <div class="learning-paths">
+            <div class="path-card" onclick="selectPath('typing', this)">
+                <div class="path-icon">⌨️</div>
+                <h2>Typing Speed</h2>
+                <p>Improve your typing speed and accuracy with fun exercises.</p>
+            </div>
+            <div class="path-card" onclick="selectPath('python', this)">
+                <div class="path-icon">🐍</div>
+                <h2>Python</h2>
+                <p>Learn Python programming from basics to advanced</p>
+            </div>
+            <div class="path-card" onclick="selectPath('webdev', this)">
+                <div class="path-icon">🌐</div>
+                <h2>Web Development</h2>
+                <p>Master HTML, CSS, and JavaScript</p>
+            </div>
+            <div class="path-card" onclick="selectPath('appdev', this)">
+                <div class="path-icon">📱</div>
+                <h2>App Development</h2>
+                <p>Build mobile apps with React Native and Flutter</p>
+            </div>
+            <div class="path-card" onclick="selectPath('datascience', this)">
+                <div class="path-icon">📊</div>
+                <h2>Data Science</h2>
+                <p>Learn data analysis and visualization</p>
+            </div>
+            <div class="path-card" onclick="selectPath('aiml', this)">
+                <div class="path-icon">🤖</div>
+                <h2>AI/ML</h2>
+                <p>Explore artificial intelligence and machine learning</p>
+            </div>
+            <div class="path-card" onclick="selectPath('uiux', this)">
+                <div class="path-icon">🎨</div>
+                <h2>UI/UX Design</h2>
+                <p>Create beautiful and functional interfaces</p>
+            </div>
+        </div>
+
+        <div id="pathContent" style="display: none;">
+            <div class="stats">
+                <h3>Your Progress</h3>
+                <div>Level: <span id="currentLevel">1</span></div>
+                <div>XP: <span id="currentXP">0 / 1000</span></div>
+                <div class="progress-bar">
+                    <div id="xpProgress"></div>
+                </div>
+            </div>
+
+            <div class="course-sections">
+                <div class="level-section">
+                    <h2>Beginner</h2>
+                    <div id="beginnerCourses"></div>
+                </div>
+                <div class="level-section">
+                    <h2>Intermediate</h2>
+                    <div id="intermediateCourses"></div>
+                </div>
+                <div class="level-section">
+                    <h2>Advanced</h2>
+                    <div id="advancedCourses"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="quizModal" class="quiz-modal">
+        <div class="quiz-content">
+            <h2>Knowledge Check</h2>
+            <div id="quizQuestion"></div>
+            <div id="quizOptions"></div>
+        </div>
+    </div>
+
+    <script src="courseData.js"></script>
+    <script>
+        let currentPath = '';
+        let userProgress = JSON.parse(localStorage.getItem('userProgress')) || {
+            xp: 0,
+            level: 1,
+            completedCourses: []
+        };
+
+        function selectPath(path, element) {
+            currentPath = path;
+            document.querySelectorAll('.path-card').forEach(card => {
+                card.classList.remove('selected-path');
+            });
+            element.classList.add('selected-path');
+            document.getElementById('pathContent').style.display = 'block';
+            window.scrollTo({ top: element.offsetTop + 300, behavior: 'smooth' });
+            loadPathContent(path);
+            updateStats();
+        }
+
+        function loadPathContent(path) {
+            const pathCourses = pathData[path];
+            ['beginner', 'intermediate', 'advanced'].forEach(level => {
+                const container = document.getElementById(`${level}Courses`);
+                container.innerHTML = '';
+                if (pathCourses && pathCourses[level]) {
+                    if (pathCourses[level].length === 0) {
+                        container.innerHTML = '<p style="color: var(--slate-400);">Courses coming soon!</p>';
+                    } else {
+                        pathCourses[level].forEach(course => {
+                            container.innerHTML += `
+                                <div class="course-item ${userProgress.completedCourses.includes(course.id) ? 'completed' : ''}"
+                                     onclick="startCourse('${course.id}')">
+                                    <h3>${course.title}</h3>
+                                    <p>${course.xp} XP</p>
+                                </div>
+                            `;
+                        });
+                    }
+                } else {
+                     container.innerHTML = '<p style="color: var(--slate-400);">No courses available for this level yet.</p>';
+                }
+            });
+        }
+
+        function startCourse(courseId) {
+            if (userProgress.completedCourses.includes(courseId)) {
+                alert('You have already completed this course!');
+                return;
+            }
+            const course = findCourse(courseId);
+            if (course) {
+                window.open(course.url, '_blank');
+                showQuiz(course);
+            }
+        }
+
+        function findCourse(courseId) {
+            if (!currentPath || !pathData[currentPath]) return null;
+            for (const level in pathData[currentPath]) {
+                const course = pathData[currentPath][level].find(c => c.id === courseId);
+                if (course) return course;
+            }
+            return null;
+        }
+
+        function showQuiz(course) {
+            const modal = document.getElementById('quizModal');
+            const quizQuestion = document.getElementById('quizQuestion');
+            const quizOptions = document.getElementById('quizOptions');
+            
+            quizQuestion.innerHTML = `<p>${course.quiz.question}</p>`;
+            quizOptions.innerHTML = course.quiz.options.map((option, index) => `
+                <button onclick="checkAnswer(${index}, '${course.id}', ${course.xp})">${option}</button>
+            `).join('');
+            
+            modal.style.display = 'flex';
+        }
+
+        function checkAnswer(answer, courseId, xp) {
+            const course = findCourse(courseId);
+            if (!course) return;
+
+            if (course.quiz.correct === answer) {
+                if (!userProgress.completedCourses.includes(courseId)) {
+                    userProgress.xp += xp;
+                    userProgress.completedCourses.push(courseId);
+                    
+                    const newLevel = Math.floor(userProgress.xp / 1000) + 1;
+                    if (newLevel > userProgress.level) {
+                        userProgress.level = newLevel;
+                        alert(`Congratulations! You've reached Level ${userProgress.level}!`);
+                    } else {
+                        alert(`Correct! You earned ${xp} XP!`);
+                    }
+
+                    localStorage.setItem('userProgress', JSON.stringify(userProgress));
+                    updateStats();
+                    loadPathContent(currentPath);
+                }
+            } else {
+                alert('Incorrect answer. Please review the material and try again!');
+            }
+            document.getElementById('quizModal').style.display = 'none';
+        }
+
+        function updateStats() {
+            document.getElementById('currentLevel').textContent = userProgress.level;
+            const xpForNextLevel = userProgress.level * 1000;
+            document.getElementById('currentXP').textContent = `${userProgress.xp} / ${xpForNextLevel}`;
+            
+            const xpBaseForCurrentLevel = (userProgress.level - 1) * 1000;
+            const xpInCurrentLevel = userProgress.xp - xpBaseForCurrentLevel;
+            const progress = (xpInCurrentLevel / 1000) * 100;
+
+            document.getElementById('xpProgress').style.width = `${Math.min(progress, 100)}%`;
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('quizModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        
+        updateStats();
+    </script>
+</body>
+</html>
