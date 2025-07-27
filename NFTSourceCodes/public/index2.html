@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyNFT Minter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .btn {
+            @apply w-full text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 shadow-md;
+        }
+        .btn-primary {
+            @apply bg-blue-600 hover:bg-blue-700;
+        }
+        .btn-secondary {
+            @apply bg-indigo-600 hover:bg-indigo-700;
+        }
+        .btn-disabled {
+            @apply bg-gray-400 cursor-not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-md mx-auto p-8 bg-gray-800 rounded-2xl shadow-2xl space-y-6 border border-gray-700">
+        
+        <!-- Header -->
+        <div>
+            <h1 class="text-3xl font-bold text-center text-white">NFT Minter</h1>
+            <p class="text-center text-gray-400 mt-2">Create your own unique digital asset on the blockchain.</p>
+        </div>
+
+        <!-- Wallet Connection -->
+        <div id="wallet-section">
+            <button id="connectButton" class="btn btn-primary">Connect Wallet</button>
+            <p id="walletStatus" class="text-center text-sm text-gray-400 mt-3"></p>
+        </div>
+
+        <!-- Minter Section (Initially Hidden) -->
+        <div id="minter-section" class="hidden space-y-4">
+            <div>
+                <label for="metadataUri" class="block text-sm font-medium text-gray-300 mb-2">Metadata URI</label>
+                <input type="url" id="metadataUri" name="metadataUri" placeholder="https://your-json-file.com/metadata.json" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <p class="text-xs text-gray-500 mt-2">This should be a link to your NFT's JSON metadata file.</p>
+            </div>
+            <button id="mintButton" class="btn btn-secondary">Mint NFT</button>
+        </div>
+
+        <!-- Status Message Area -->
+        <div id="statusMessage" class="text-center text-sm p-4 rounded-lg hidden"></div>
+
+    </div>
+
+    <script>
+        // --- Configuration ---
+        // ==================================================================
+        // === IMPORTANT: PASTE YOUR DEPLOYED CONTRACT ADDRESS HERE! ===
+        // ==================================================================
+        // You get this address after deploying your contract in Remix.
+        const contractAddress = "0xfba3ae60238825B40c8df79f315932Ee8885d61F"; 
+        
+        // The ABI (Application Binary Interface) tells our script how to interact with the contract.
+        const contractABI = [
+            "function safeMint(address to, string memory uri)",
+            "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
+        ];
+
+        // --- Element References ---
+        const connectButton = document.getElementById('connectButton');
+        const mintButton = document.getElementById('mintButton');
+        const walletSection = document.getElementById('wallet-section');
+        const minterSection = document.getElementById('minter-section');
+        const walletStatus = document.getElementById('walletStatus');
+        const statusMessage = document.getElementById('statusMessage');
+        const metadataUriInput = document.getElementById('metadataUri');
+
+        // --- State Variables ---
+        let provider;
+        let signer;
+        let userAddress;
+
+        // --- Functions ---
+
+        /**
+         * Displays a status message to the user.
+         * @param {string} message - The message to display.
+         * @param {boolean} isError - True if the message is an error.
+         */
+        function showStatus(message, isError = false) {
+            statusMessage.textContent = message;
+            statusMessage.classList.remove('hidden', 'bg-green-900', 'text-green-300', 'bg-red-900', 'text-red-300');
+            if (isError) {
+                statusMessage.classList.add('bg-red-900', 'text-red-300');
+            } else {
+                statusMessage.classList.add('bg-green-900', 'text-green-300');
+            }
+        }
+
+        /**
+         * Connects to the user's MetaMask wallet.
+         */
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                showStatus("MetaMask is not installed. Please install it to continue.", true);
+                return;
+            }
+
+            try {
+                showStatus("Connecting to wallet...", false);
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                userAddress = await signer.getAddress();
+
+                // Update UI
+                walletSection.classList.add('hidden');
+                minterSection.classList.remove('hidden');
+                walletStatus.textContent = `Connected: ${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+                showStatus("Wallet connected successfully!", false);
+
+            } catch (error) {
+                console.error("Wallet connection failed:", error);
+                showStatus("Wallet connection failed. Please try again.", true);
+            }
+        }
+
+        /**
+         * Mints a new NFT by calling the smart contract.
+         */
+        async function mintNFT() {
+            if (!signer) {
+                showStatus("Please connect your wallet first.", true);
+                return;
+            }
+            
+            // This is the safety check. It should compare against the ORIGINAL placeholder.
+            // I have fixed this line for you.
+            if (contractAddress === "YOUR_CONTRACT_ADDRESS") {
+                showStatus("Error: Please update the contract address in the script.", true);
+                return;
+            }
+
+            const metadataURI = metadataUriInput.value;
+            if (!metadataURI) {
+                showStatus("Please provide a metadata URI.", true);
+                return;
+            }
+
+            try {
+                mintButton.disabled = true;
+                mintButton.textContent = "Minting...";
+                mintButton.classList.add('btn-disabled');
+                showStatus("Preparing to mint... Please confirm in MetaMask.", false);
+
+                const nftContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+                // Call the 'safeMint' function on the contract
+                const transaction = await nftContract.safeMint(userAddress, metadataURI);
+                
+                showStatus("Minting in progress... waiting for confirmation.", false);
+                
+                // Wait for the transaction to be mined and confirmed on the blockchain
+                await transaction.wait();
+
+                showStatus(`Success! NFT minted. Transaction: ${transaction.hash.substring(0,10)}...`, false);
+                metadataUriInput.value = ''; // Clear input on success
+
+            } catch (error) {
+                console.error("Minting failed:", error);
+                showStatus(error.reason || "Minting failed. Check the console for details.", true);
+            } finally {
+                mintButton.disabled = false;
+                mintButton.textContent = "Mint NFT";
+                mintButton.classList.remove('btn-disabled');
+            }
+        }
+
+        // --- Event Listeners ---
+        connectButton.addEventListener('click', connectWallet);
+        mintButton.addEventListener('click', mintNFT);
+
+    </script>
+</body>
+</html>
